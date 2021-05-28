@@ -1,0 +1,22 @@
+{
+  "name": "tvtime-api",
+  "description": "Unofficial TvTime Api for node",
+  "main": "src/index.js",
+  "keywords": [
+    "tvtime",
+    "api",
+    "shows",
+    "movies",
+    "series"
+  ],
+  "author": "Edgar Valencia <isc.edgarvalencia@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EdgarVaguencia/tvtime-api.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.9",
+    "needle": "^2.6.0"
+  }
+}
