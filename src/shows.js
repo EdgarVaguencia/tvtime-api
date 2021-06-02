@@ -44,7 +44,7 @@ async function getShows () {
 
 /**
  * Return info about single serie
- * @param {string} serieId
+ * @param {int} serieId
  */
 async function getShow (serieId = 0) {
   let cookies
@@ -73,15 +73,18 @@ async function getShow (serieId = 0) {
           divSeason('ul.episode-list li').each((index, li) => {
             let episode = cheerio.load(li)
 
-            let linkEpisode = episode('div.infos div.row a')[0]
+            let linkEpisode = episode('div.infos div.row a:first')
             let idEpisode = linkEpisode.attr('href').split('/')
-            let nameEpisode = linkEpisode('span.episode-name').text().trim()
+            let nameEpisode = episode('div.infos div.row a span.episode-name').text().trim()
             let airEpisode = episode('div.infos div.row a span.episode-air-date').text().trim()
+            let watchedBtn = episode('a.watched-btn')
+            let episodeWatched = watchedBtn.hasClass('active')
 
             episodios.push({
               id: idEpisode[5],
               name: nameEpisode,
-              airDate: airEpisode
+              airDate: airEpisode,
+              watched: episodeWatched
             })
           })
 
