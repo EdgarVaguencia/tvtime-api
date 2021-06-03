@@ -20,7 +20,7 @@ function getUser () {
   return userId
 }
 
-async function setCookie (obj) {
+async function setCookie (obj, remove = false) {
   let current = setting
   current.tvstRemember = obj.tvstRemember
   current.symfony = obj.symfony
@@ -28,7 +28,7 @@ async function setCookie (obj) {
   await fs.writeFile(`${__dirname}/access.json`, JSON.stringify(current), err => {
     if (err) throw err
 
-    console.info('Credenciales almacenadas')
+    remove ? console.info('Credenciales eliminadas') : console.info('Credenciales almacenadas')
   })
 }
 
@@ -39,8 +39,16 @@ async function setUser (userId = 0) {
   await fs.writeFile(`${__dirname}/access.json`, JSON.stringify(current), err => {
     if (err) throw err
 
-    console.info('Usuario almacenado')
+    userId === 0 ? console.info('Usuario eliminado') : console.info('Usuario almacenado')
   })
 }
 
-module.exports = { getCookies, getUser, setCookie, setUser }
+function removeCookie () {
+  setCookie({ tvstRemember: '', symfony: '' }, true)
+}
+
+function removeUser () {
+  setUser()
+}
+
+module.exports = { getCookies, getUser, setCookie, setUser, removeCookie, removeUser }

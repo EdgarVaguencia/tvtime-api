@@ -47,7 +47,7 @@ async function getEpisode (serieId = 0, episodeId = 0) {
 async function episodeMark (episodeId = 0) {
   let cookies
 
-  if (util.getCookies().length !== undefined) {
+  if (util.getCookies().tvstRemember !== undefined) {
     cookies = { cookies: util.getCookies() }
   } else {
     return 'User not login'
@@ -59,7 +59,12 @@ async function episodeMark (episodeId = 0) {
     }, cookies)
     .then(resp => {
       if (resp.statusCode === 200) {
-        return 'Completado'
+        return 'Ok'
+      }
+
+      if (resp.cookies.tvstRemember === 'deleted') {
+        util.removeCookie()
+        return 'Login expired'
       }
       return resp.statusMessage
     })

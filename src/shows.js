@@ -10,7 +10,7 @@ async function getShows () {
   let listShows = []
   let userId, cookies
 
-  if (util.getCookies().length !== undefined) {
+  if (util.getCookies().tvstRemember !== undefined) {
     cookies = { cookies: util.getCookies() }
   } else {
     return 'User not login'
