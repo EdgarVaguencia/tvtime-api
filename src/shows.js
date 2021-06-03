@@ -7,15 +7,18 @@ const util = require('./utils')
  * @returns {Array} [ {id: {serieId}, name: {serieName}, img: {urlImage} } ]
  */
 async function getShows () {
-  let cookies, userId
   let listShows = []
+  let userId, cookies
 
-  cookies = util.getCookies()
+  if (util.getCookies().length !== undefined) {
+    cookies = { cookies: util.getCookies() }
+  } else {
+    return 'User not login'
+  }
+
   userId = util.getUser()
 
-  return needle('get', `https://www.tvtime.com/en/user/${userId}/profile`, {
-    cookies: cookies
-  })
+  return needle('get', `https://www.tvtime.com/en/user/${userId}/profile`, cookies)
     .then((resp) => {
       let cook = resp.cookies
 
@@ -47,16 +50,12 @@ async function getShows () {
  * @param {int} serieId
  */
 async function getShow (serieId = 0) {
-  let cookies
   let infoShows = {}
+  let cookies = util.getCookies() ? { cookies: util.getCookies() } : {}
 
-  cookies = util.getCookies()
-
-  return needle('get', `https://www.tvtime.com/en/show/${serieId}`, {
-    cookies: cookies
-  })
+  return needle('get', `https://www.tvtime.com/en/show/${serieId}`, cookies)
     .then(resp => {
-      if (resp.statusCode === 200 && resp.cookies.tvstRemember) {
+      if (resp.statusCode === 200) {
         let page = cheerio.load(resp.body)
 
         let header = page('div.container-fluid div.heading-info')
@@ -104,7 +103,7 @@ async function getShow (serieId = 0) {
       return infoShows
     })
     .catch(err => {
-      throw err
+      return err
     })
 }
 

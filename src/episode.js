@@ -9,13 +9,11 @@ const util = require('./utils')
  */
 async function getEpisode (serieId = 0, episodeId = 0) {
   let infoEpisode = {}
-  let cookies = util.getCookies()
+  let cookies = util.getCookies() ? { cookies: util.getCookies() } : {}
 
-  return needle('get', `https://www.tvtime.com/es/show/${serieId}/episode/${episodeId}`, {
-    cookies: cookies
-  })
+  return needle('get', `https://www.tvtime.com/es/show/${serieId}/episode/${episodeId}`, cookies)
     .then(resp => {
-      if (resp.statusCode === 200 && resp.cookies.tvstRemember) {
+      if (resp.statusCode === 200) {
         let page = cheerio.load(resp.body)
 
         let watched = page('a.watched-btn')
@@ -47,15 +45,18 @@ async function getEpisode (serieId = 0, episodeId = 0) {
  * @param {int} episodeId
  */
 async function episodeMark (episodeId = 0) {
-  let cookies = util.getCookies()
+  let cookies
+
+  if (util.getCookies().length !== undefined) {
+    cookies = { cookies: util.getCookies() }
+  } else {
+    return 'User not login'
+  }
 
   return needle('put', 'https://www.tvtime.com/watched_episodes',
     {
       episode_id: episodeId
-    },
-    {
-      cookies: cookies
-    })
+    }, cookies)
     .then(resp => {
       if (resp.statusCode === 200) {
         return 'Completado'
