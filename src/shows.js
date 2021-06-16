@@ -1,4 +1,3 @@
-const needle = require('needle')
 const cheerio = require('cheerio')
 const util = require('./utils')
 
@@ -6,24 +5,19 @@ const util = require('./utils')
  * Return yours list of series
  * @returns {Array} [ {id: {serieId}, name: {serieName}, img: {urlImage} } ]
  */
-async function getShows () {
+function getShows () {
   let listShows = []
-  let userId, cookies
 
-  if (util.getCookies().tvstRemember !== undefined) {
-    cookies = { cookies: util.getCookies() }
-  } else {
-    return 'User not login'
-  }
+  return new Promise((resolve, reject) => {
+    if (!util.isLogin()) {
+      resolve('User no login')
+      return
+    }
+    const userId = util.getUser()
 
-  userId = util.getUser()
-
-  return needle('get', `https://www.tvtime.com/en/user/${userId}/profile`, cookies)
-    .then((resp) => {
-      let cook = resp.cookies
-
-      if (resp.statusCode === 200 && cook.tvstRemember) {
-        let bodyParse = cheerio.load(resp.body)
+    util.get(`/en/user/${userId}/profile`)
+      .then(resp => {
+        const bodyParse = cheerio.load(resp.body)
 
         bodyParse('ul.shows-list li.first-loaded')
           .each((index, item) => {
@@ -37,74 +31,78 @@ async function getShows () {
               img: imgSerie.attr('src')
             })
           })
-      }
-      return listShows
-    })
-    .catch(err => {
-      throw err
-    })
+
+        resolve(listShows)
+      })
+      .catch(err => {
+        reject(err)
+      })
+  })
 }
 
 /**
  * Return info about single serie
  * @param {int} serieId
  */
-async function getShow (serieId = 0) {
+function getShow (serieId = 0) {
   let infoShows = {}
-  let cookies = util.getCookies() ? { cookies: util.getCookies() } : {}
+  return new Promise((resolve, reject) => {
+    util.get(`/en/show/${serieId}`)
+      .then(resp => {
+        if (resp.statusCode === 200) {
+          let page = cheerio.load(resp.body)
 
-  return needle('get', `https://www.tvtime.com/en/show/${serieId}`, cookies)
-    .then(resp => {
-      if (resp.statusCode === 200) {
-        let page = cheerio.load(resp.body)
+          let header = page('div.container-fluid div.heading-info')
+          let info = page('div.show-nav')
+          let temporadas = []
 
-        let header = page('div.container-fluid div.heading-info')
-        let info = page('div.show-nav')
-        let temporadas = []
+          page('div.seasons div.season-content').each((index, item) => {
+            let divSeason = cheerio.load(item)
 
-        page('div.seasons div.season-content').each((index, item) => {
-          let divSeason = cheerio.load(item)
+            let name = divSeason('span[itemprop="name"]').text()
 
-          let name = divSeason('span[itemprop="name"]').text()
+            let episodios = []
 
-          let episodios = []
+            divSeason('ul.episode-list li').each((index, li) => {
+              let episode = cheerio.load(li)
 
-          divSeason('ul.episode-list li').each((index, li) => {
-            let episode = cheerio.load(li)
+              let linkEpisode = episode('div.infos div.row a:first')
+              let idEpisode = linkEpisode.attr('href').split('/')
+              let nameEpisode = episode('div.infos div.row a span.episode-name').text().trim()
+              let airEpisode = episode('div.infos div.row a span.episode-air-date').text().trim()
+              let watchedBtn = episode('a.watched-btn')
+              let episodeWatched = watchedBtn.hasClass('active')
 
-            let linkEpisode = episode('div.infos div.row a:first')
-            let idEpisode = linkEpisode.attr('href').split('/')
-            let nameEpisode = episode('div.infos div.row a span.episode-name').text().trim()
-            let airEpisode = episode('div.infos div.row a span.episode-air-date').text().trim()
-            let watchedBtn = episode('a.watched-btn')
-            let episodeWatched = watchedBtn.hasClass('active')
+              episodios.push({
+                id: idEpisode[5],
+                name: nameEpisode,
+                airDate: airEpisode,
+                watched: episodeWatched
+              })
+            })
 
-            episodios.push({
-              id: idEpisode[5],
-              name: nameEpisode,
-              airDate: airEpisode,
-              watched: episodeWatched
+            temporadas.push({
+              name: name,
+              episodes: episodios
             })
           })
 
-          temporadas.push({
-            name: name,
-            episodes: episodios
-          })
-        })
+          infoShows = {
+            id: serieId,
+            name: header.children('h1').text().trim(),
+            overview: info.children().find('div.overview').text().trim(),
+            seasons: temporadas
+          }
 
-        infoShows = {
-          id: serieId,
-          name: header.children('h1').text().trim(),
-          overview: info.children().find('div.overview').text().trim(),
-          seasons: temporadas
+          resolve(infoShows)
+          return
         }
-      }
-      return infoShows
-    })
-    .catch(err => {
-      return err
-    })
+        reject(new Error('Page not found'))
+      })
+      .catch(err => {
+        reject(err)
+      })
+  })
 }
 
 module.exports = { getShows, getShow }

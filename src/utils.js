@@ -1,7 +1,9 @@
 const fs = require('fs')
-const setting = require(`${__dirname}/access.json`)
+const needle = require('needle')
+const urlBase = 'https://www.tvtime.com'
 
 function getCookies () {
+  const setting = require(`${__dirname}/access.json`)
   let cookies = {}
   if (setting.tvstRemember.length > 0) {
     cookies = {
@@ -13,6 +15,7 @@ function getCookies () {
 }
 
 function getUser () {
+  const setting = require(`${__dirname}/access.json`)
   let userId = 0
   if (setting.user > 0) {
     userId = setting.user
@@ -20,35 +23,107 @@ function getUser () {
   return userId
 }
 
-async function setCookie (obj, remove = false) {
-  let current = setting
-  current.tvstRemember = obj.tvstRemember
-  current.symfony = obj.symfony
+async function setCookie (callback, obj, remove = false) {
+  let setting = require(`${__dirname}/access.json`)
+  setting = Object.assign(setting, obj)
 
-  await fs.writeFile(`${__dirname}/access.json`, JSON.stringify(current), err => {
-    if (err) throw err
+  await fs.open(`${__dirname}/access.json`, 'w', (err, d) => {
+    if (err) console.error(err)
 
-    remove ? console.info('Credenciales eliminadas') : console.info('Credenciales almacenadas')
+    fs.write(d, JSON.stringify(setting, null, '\t'), 0, 'utf-8', err => {
+      if (err) return err
+
+      let txt = remove ? 'Credenciales eliminadas' : 'Credenciales almacenadas'
+
+      callback(txt)
+    })
   })
 }
 
-async function setUser (userId = 0) {
-  let current = setting
-  current.user = userId
+function setUser (callback, userId = 0) {
+  setCookie(callback, {user: userId})
+}
 
-  await fs.writeFile(`${__dirname}/access.json`, JSON.stringify(current), err => {
-    if (err) throw err
-
-    userId === 0 ? console.info('Usuario eliminado') : console.info('Usuario almacenado')
+function removeAccess () {
+  return new Promise((resolve, reject) => {
+    setCookie(r => {
+        resolve(r)
+      }, { tvstRemember: '', symfony: '', user: 0 }, true)
   })
 }
 
-function removeCookie () {
-  setCookie({ tvstRemember: '', symfony: '' }, true)
+function isLogin () {
+  if (getCookies().tvstRemember !== undefined) {
+    return true
+  }
+  return false
 }
 
-function removeUser () {
-  setUser()
+function get (urlPath, data) {
+  const url = urlBase + urlPath
+  const cookies = { cookies: getCookies() }
+
+  return new Promise((resolve, reject) => {
+    needle('get', url, data, cookies)
+      .then(resp => {
+        if (resp.cookies && resp.cookies.tvstRemember === 'deleted') {
+          return removeAccess()
+            .then(d => {
+              resolve(d)
+            })
+        }
+
+        resolve(resp)
+    })
+    .catch(err => {
+      reject(err)
+    })
+  })
 }
 
-module.exports = { getCookies, getUser, setCookie, setUser, removeCookie, removeUser }
+function post (urlPath, data) {
+  const url = urlBase + urlPath
+
+  return new Promise((resolve, reject)=> {
+    needle('post', url, data)
+      .then(resp => {
+        let cookies = resp.cookies
+
+        if (cookies.tvstRemember) {
+          setCookie(d => {
+            resolve(d)
+            return
+          }, { tvstRemember: cookies.tvstRemember, symfony: cookies.symfony })
+        } else {
+          resolve('')
+        }
+      })
+      .catch(err => {
+        reject(err)
+      })
+    })
+}
+
+function put (urlPath, data) {
+  const url = urlBase + urlPath
+  const cookies = { cookies: getCookies() }
+
+  return new Promise((resolve, reject) => {
+    needle('put', url, data, cookies)
+      .then(resp => {
+        if (resp.cookies && resp.cookies.tvstRemember === 'deleted') {
+          return removeAccess()
+            .then(d => {
+              resolve(d)
+              return
+            })
+        }
+        resolve(resp)
+      })
+      .catch(err => {
+        reject(err)
+      })
+  })
+}
+
+module.exports = { getUser, setUser, isLogin, get, post, put }

@@ -57,10 +57,11 @@ sons, and motley band of pillaging conquerors.",
 
 Methods
 -------
-| Method | Parameter | login |Response |
-| --- | --- | --- | --- |
-| login | username, password | | Session |
-| shows | | ✔ | List series you track |
-| show | idShow | | Info serie and list episodes |
-| episodeWatch | idEpisode | ✔ | Mark episode as watched |
-| episode | idShow, idEpisode | | Info episode |
+| Method | Description | Parameter | Login required | Response |
+| --- | --- | --- | --- | --- |
+| login | Login to TvTime | username, password | | |
+| logout | Logout (remove data) | | | |
+| shows | Get list series you track | | ✔ | Array |
+| show | Info serie and list episodes | idShow | | Array |
+| episodeWatch | Mark episode as watched | idEpisode | ✔ | |
+| episode | Get info about | idShow, idEpisode | | Array |
