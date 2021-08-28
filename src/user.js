@@ -33,21 +33,25 @@ function login (user, passw, force = false) {
 /**
  * Get Id User Profile
  */
-function getUser () {
+function getUser (url = '/en') {
   return new Promise((resolve, reject) => {
-    if (!utils.isLogin) {
+    if (!utils.isLogin()) {
       resolve('User no login')
       return
     }
 
-    utils.get('/en')
+    utils.get(url)
       .then(resp => {
         const body = cheerio.load(resp.body)
 
-        const linkProfile = body('li.profile a').attr('href').split('/')
-        utils.setUser(r => {
-          resolve(r)
-        }, linkProfile[3])
+        if (body('meta').attr('http-equiv') === 'refresh') {
+          getUser('/en/add-shows')
+        } else {
+          const linkProfile = body('li.profile a').attr('href').split('/')
+          utils.setUser(r => {
+            resolve(r)
+          }, linkProfile[3])
+        }
       })
   })
 }
