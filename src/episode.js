@@ -13,15 +13,15 @@ function getEpisode (serieId = 0, episodeId = 0) {
     util.get(`/en/show/${serieId}/episode/${episodeId}`)
       .then(resp => {
         if (resp.statusCode === 200) {
-          let page = cheerio.load(resp.body)
+          const page = cheerio.load(resp.body)
 
-          let watched = page('a.watched-btn')
-          let episodeWatched = watched.hasClass('watched')
+          const watched = page('a.watched-btn')
+          const episodeWatched = watched.hasClass('watched')
 
-          let info = page('div.episode-infos')
-          let name = info.children().find('span[itemprop="name"]').text()
-          let overview = info.children().find('div.overview span.long').text().trim()
-          let published = info.children().find('time[itemprop="datePublished"]').text()
+          const info = page('div.episode-infos')
+          const name = info.children().find('span[itemprop="name"]').text()
+          const overview = info.children().find('div.overview span.long').text().trim()
+          const published = info.children().find('time[itemprop="datePublished"]').text()
 
           infoEpisode = {
             showId: serieId,
@@ -34,7 +34,7 @@ function getEpisode (serieId = 0, episodeId = 0) {
           resolve(infoEpisode)
           return
         }
-        reject('Page not found')
+        reject(new Error('Page not found'))
       })
       .catch(err => {
         reject(err)
@@ -52,15 +52,13 @@ function episodeMark (episodeId = 0) {
       resolve('User not login')
       return
     }
-    util.put('/watched_episodes', { episode_id: episodeId})
+    util.put('/watched_episodes', { episode_id: episodeId })
       .then(resp => {
         if (typeof resp === 'string') {
           resolve(resp)
-          return
         } else {
           if (resp.statusCode === 200) {
             resolve('Ok')
-            return
           } else {
             reject(resp.statusMessage)
           }

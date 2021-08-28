@@ -2,7 +2,7 @@
   "name": "tvtime-api",
   "description": "Unofficial TvTime Api for node",
   "main": "src/index.js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "keywords": [
     "tvtime",
     "api",
@@ -16,9 +16,18 @@
     "url": "https://github.com/EdgarVaguencia/tvtime-api.git"
   },
   "license": "MIT",
+  "scripts": {
+    "postinstall": "husky install",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable"
+  },
   "dependencies": {
     "cheerio": "^1.0.0-rc.9",
     "needle": "^2.6.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "husky": "^7.0.2",
+    "pinst": "^2.1.6",
+    "standard": "^16.0.3"
+  }
 }

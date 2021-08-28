@@ -6,7 +6,7 @@ const util = require('./utils')
  * @returns {Array} [ {id: {serieId}, name: {serieName}, img: {urlImage} } ]
  */
 function getShows () {
-  let listShows = []
+  const listShows = []
 
   return new Promise((resolve, reject) => {
     if (!util.isLogin()) {
@@ -21,9 +21,9 @@ function getShows () {
 
         bodyParse('ul.shows-list li.first-loaded')
           .each((index, item) => {
-            let li = cheerio.load(item)
-            let linkSerie = li('div.poster-details a')
-            let imgSerie = li('div.image-crop img')
+            const li = cheerio.load(item)
+            const linkSerie = li('div.poster-details a')
+            const imgSerie = li('div.image-crop img')
 
             listShows.push({
               id: linkSerie.attr('href').split('/')[3],
@@ -50,28 +50,28 @@ function getShow (serieId = 0) {
     util.get(`/en/show/${serieId}`)
       .then(resp => {
         if (resp.statusCode === 200) {
-          let page = cheerio.load(resp.body)
+          const page = cheerio.load(resp.body)
 
-          let header = page('div.container-fluid div.heading-info')
-          let info = page('div.show-nav')
-          let temporadas = []
+          const header = page('div.container-fluid div.heading-info')
+          const info = page('div.show-nav')
+          const temporadas = []
 
           page('div.seasons div.season-content').each((index, item) => {
-            let divSeason = cheerio.load(item)
+            const divSeason = cheerio.load(item)
 
-            let name = divSeason('span[itemprop="name"]').text()
+            const name = divSeason('span[itemprop="name"]').text()
 
-            let episodios = []
+            const episodios = []
 
             divSeason('ul.episode-list li').each((index, li) => {
-              let episode = cheerio.load(li)
+              const episode = cheerio.load(li)
 
-              let linkEpisode = episode('div.infos div.row a:first')
-              let idEpisode = linkEpisode.attr('href').split('/')
-              let nameEpisode = episode('div.infos div.row a span.episode-name').text().trim()
-              let airEpisode = episode('div.infos div.row a span.episode-air-date').text().trim()
-              let watchedBtn = episode('a.watched-btn')
-              let episodeWatched = watchedBtn.hasClass('active')
+              const linkEpisode = episode('div.infos div.row a:first')
+              const idEpisode = linkEpisode.attr('href').split('/')
+              const nameEpisode = episode('div.infos div.row a span.episode-name').text().trim()
+              const airEpisode = episode('div.infos div.row a span.episode-air-date').text().trim()
+              const watchedBtn = episode('a.watched-btn')
+              const episodeWatched = watchedBtn.hasClass('active')
 
               episodios.push({
                 id: idEpisode[5],

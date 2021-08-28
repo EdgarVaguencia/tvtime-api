@@ -1,9 +1,10 @@
 const fs = require('fs')
+const path = require('path')
 const needle = require('needle')
 const urlBase = 'https://www.tvtime.com'
 
 function getCookies () {
-  const setting = require(`${__dirname}/access.json`)
+  const setting = require(path.join(__dirname, 'access.json'))
   let cookies = {}
   if (setting.tvstRemember.length > 0) {
     cookies = {
@@ -15,7 +16,7 @@ function getCookies () {
 }
 
 function getUser () {
-  const setting = require(`${__dirname}/access.json`)
+  const setting = require(path.join(__dirname, 'access.json'))
   let userId = 0
   if (setting.user > 0) {
     userId = setting.user
@@ -24,16 +25,16 @@ function getUser () {
 }
 
 async function setCookie (callback, obj, remove = false) {
-  let setting = require(`${__dirname}/access.json`)
+  let setting = require(path.join(__dirname, 'access.json'))
   setting = Object.assign(setting, obj)
 
-  await fs.open(`${__dirname}/access.json`, 'w', (err, d) => {
+  await fs.open(path.join(__dirname, 'access.json'), 'w', (err, d) => {
     if (err) console.error(err)
 
     fs.write(d, JSON.stringify(setting, null, '\t'), 0, 'utf-8', err => {
       if (err) return err
 
-      let txt = remove ? 'Credenciales eliminadas' : 'Credenciales almacenadas'
+      const txt = remove ? 'Credenciales eliminadas' : 'Credenciales almacenadas'
 
       callback(txt)
     })
@@ -41,14 +42,14 @@ async function setCookie (callback, obj, remove = false) {
 }
 
 function setUser (callback, userId = 0) {
-  setCookie(callback, {user: userId})
+  setCookie(callback, { user: userId })
 }
 
 function removeAccess () {
   return new Promise((resolve, reject) => {
     setCookie(r => {
-        resolve(r)
-      }, { tvstRemember: '', symfony: '', user: 0 }, true)
+      resolve(r)
+    }, { tvstRemember: '', symfony: '', user: 0 }, true)
   })
 }
 
@@ -74,25 +75,24 @@ function get (urlPath, data) {
         }
 
         resolve(resp)
-    })
-    .catch(err => {
-      reject(err)
-    })
+      })
+      .catch(err => {
+        reject(err)
+      })
   })
 }
 
 function post (urlPath, data) {
   const url = urlBase + urlPath
 
-  return new Promise((resolve, reject)=> {
+  return new Promise((resolve, reject) => {
     needle('post', url, data)
       .then(resp => {
-        let cookies = resp.cookies
+        const cookies = resp.cookies
 
         if (cookies.tvstRemember) {
           setCookie(d => {
             resolve(d)
-            return
           }, { tvstRemember: cookies.tvstRemember, symfony: cookies.symfony })
         } else {
           resolve('')
@@ -101,7 +101,7 @@ function post (urlPath, data) {
       .catch(err => {
         reject(err)
       })
-    })
+  })
 }
 
 function put (urlPath, data) {
@@ -115,7 +115,6 @@ function put (urlPath, data) {
           return removeAccess()
             .then(d => {
               resolve(d)
-              return
             })
         }
         resolve(resp)

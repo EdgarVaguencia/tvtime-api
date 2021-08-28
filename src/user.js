@@ -8,7 +8,6 @@ const utils = require('./utils')
  * @param {boolean} force
  */
 function login (user, passw, force = false) {
-
   return new Promise((resolve, reject) => {
     if (utils.isLogin() && !force) {
       resolve('User is login')
@@ -16,18 +15,18 @@ function login (user, passw, force = false) {
     }
 
     utils.post('/signin', {
-      'username': user,
-      'password': passw
+      username: user,
+      password: passw
     })
-    .then(_ => {
-      getUser()
-        .then(r => {
-          resolve(r)
-        })
+      .then(_ => {
+        getUser()
+          .then(r => {
+            resolve(r)
+          })
       })
-    .catch(err => {
-      reject(err)
-    })
+      .catch(err => {
+        reject(err)
+      })
   })
 }
 
@@ -43,9 +42,9 @@ function getUser () {
 
     utils.get('/en')
       .then(resp => {
-        let body = cheerio.load(resp.body)
+        const body = cheerio.load(resp.body)
 
-        let linkProfile = body('li.profile a').attr('href').split('/')
+        const linkProfile = body('li.profile a').attr('href').split('/')
         utils.setUser(r => {
           resolve(r)
         }, linkProfile[3])
