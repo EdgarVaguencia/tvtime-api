@@ -7,6 +7,8 @@ module.exports = {
   logout: user.signOut,
   shows: shows.getShows,
   show: shows.getShow,
+  followShow: shows.followShow,
+  unFollowShow: shows.unfollowShow,
   episode: episode.getEpisode,
   episodeWatch: episode.episodeMark
 }

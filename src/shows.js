@@ -34,9 +34,7 @@ function getShows () {
 
         resolve(listShows)
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
 }
 
@@ -99,10 +97,44 @@ function getShow (serieId = 0) {
         }
         reject(new Error('Page not found'))
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
 }
 
-module.exports = { getShows, getShow }
+/**
+ * Follow Serie
+ * @param {int} serieId
+ */
+function followShow (serieId = 0) {
+  return new Promise((resolve, reject) => {
+    util.put('/followed_shows', { show_id: serieId })
+      .then(resp => {
+        if (resp.statusCode === 200) {
+          resolve('Ok')
+        } else {
+          reject(resp.statusMessage)
+        }
+      })
+      .catch(reject)
+  })
+}
+
+/**
+ * UnFollow Serie
+ * @param {int} serieId
+ */
+function unfollowShow (serieId = 0) {
+  return new Promise((resolve, reject) => {
+    util.deleted('/followed_shows', { show_id: serieId })
+      .then(resp => {
+        if (resp.statusCode === 200) {
+          resolve('Ok')
+        } else {
+          reject(resp.statusMessage)
+        }
+      })
+      .catch(reject)
+  })
+}
+
+module.exports = { getShows, getShow, followShow, unfollowShow }

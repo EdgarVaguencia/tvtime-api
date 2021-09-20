@@ -20,13 +20,10 @@ function login (user, passw, force = false) {
     })
       .then(_ => {
         getUser()
-          .then(r => {
-            resolve(r)
-          })
+          .then(resolve)
+          .catch(reject)
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
 }
 
@@ -45,14 +42,13 @@ function getUser (url = '/en') {
         const body = cheerio.load(resp.body)
 
         if (body('meta').attr('http-equiv') === 'refresh') {
-          getUser('/en/add-shows')
+          resolve(getUser('/en/add-shows'))
         } else {
           const linkProfile = body('li.profile a').attr('href').split('/')
-          utils.setUser(r => {
-            resolve(r)
-          }, linkProfile[3])
+          utils.setUser(resolve, linkProfile[3])
         }
       })
+      .catch(reject)
   })
 }
 
@@ -60,11 +56,14 @@ function getUser (url = '/en') {
  * Exit
  */
 function signOut () {
-  if (!utils.isLogin()) {
-    return 'User no login'
-  }
+  return new Promise((resolve, reject) => {
+    if (!utils.isLogin()) {
+      resolve('User no login')
+      return
+    }
 
-  return utils.get('/signout')
+    resolve(utils.get('/signout'))
+  })
 }
 
 module.exports = { login, signOut }

@@ -63,5 +63,7 @@ Methods
 | logout | Logout (remove data) | | | |
 | shows | Get list series you track | | ✔ | Array |
 | show | Info serie and list episodes | idShow | | Array |
+| followShow | Follow Show | idShow | ✔ | |
+| unFollowShow | UnFollow Show | idShow | ✔ | |
 | episodeWatch | Mark episode as watched | idEpisode | ✔ | |
 | episode | Get info about | idShow, idEpisode | | Array |

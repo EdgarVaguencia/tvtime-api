@@ -36,9 +36,7 @@ function getEpisode (serieId = 0, episodeId = 0) {
         }
         reject(new Error('Page not found'))
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
 }
 
@@ -64,37 +62,8 @@ function episodeMark (episodeId = 0) {
           }
         }
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
-
-  // let cookies
-
-  // if (util.getCookies().tvstRemember !== undefined) {
-  //   cookies = { cookies: util.getCookies() }
-  // } else {
-  //   return 'User not login'
-  // }
-
-  // return needle('put', 'https://www.tvtime.com/watched_episodes',
-  //   {
-  //     episode_id: episodeId
-  //   }, cookies)
-  //   .then(resp => {
-  //     if (resp.statusCode === 200) {
-  //       return 'Ok'
-  //     }
-
-  //     if (resp.cookies.tvstRemember === 'deleted') {
-  //       util.removeAccess()
-  //       return 'Login expired'
-  //     }
-  //     return resp.statusMessage
-  //   })
-  //   .catch(err => {
-  //     throw err
-  //   })
 }
 
 module.exports = { getEpisode, episodeMark }

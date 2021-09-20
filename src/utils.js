@@ -69,16 +69,12 @@ function get (urlPath, data) {
       .then(resp => {
         if (resp.cookies && resp.cookies.tvstRemember === 'deleted') {
           return removeAccess()
-            .then(d => {
-              resolve(d)
-            })
+            .then(resolve)
         }
 
         resolve(resp)
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
 }
 
@@ -98,9 +94,7 @@ function post (urlPath, data) {
           resolve('')
         }
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
 }
 
@@ -113,16 +107,31 @@ function put (urlPath, data) {
       .then(resp => {
         if (resp.cookies && resp.cookies.tvstRemember === 'deleted') {
           return removeAccess()
-            .then(d => {
-              resolve(d)
-            })
+            .then(resolve)
+            .catch(reject)
         }
         resolve(resp)
       })
-      .catch(err => {
-        reject(err)
-      })
+      .catch(reject)
   })
 }
 
-module.exports = { getUser, setUser, isLogin, get, post, put }
+function deleted (urlPath, data) {
+  const url = urlBase + urlPath
+  const cookies = { cookies: getCookies() }
+
+  return new Promise((resolve, reject) => {
+    needle('delete', url, data, cookies)
+      .then(resp => {
+        if (resp.cookies && resp.cookies.tvstRemember === 'deleted') {
+          return removeAccess()
+            .then(resolve)
+            .catch(reject)
+        }
+        resolve(resp)
+      })
+      .catch(reject)
+  })
+}
+
+module.exports = { getUser, setUser, isLogin, get, post, put, deleted }
