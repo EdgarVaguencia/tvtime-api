@@ -66,4 +66,31 @@ function episodeMark (episodeId = 0) {
   })
 }
 
-module.exports = { getEpisode, episodeMark }
+/**
+ * @param {int} episodeId
+ * @param {int} emotionId
+ */
+function episodeEmotion (episodeId = 0, emotionId = 0) {
+  return new Promise((resolve, reject) => {
+    if (!util.isLogin) {
+      resolve('User not login')
+      return
+    }
+    util.post('/emotions', { episode_id: episodeId, emotion_id: emotionId })
+      .then(resp => {
+        console.info(resp)
+        if (typeof resp === 'string') {
+          resolve(resp)
+        } else {
+          if (resp.statusCode === 200) {
+            resolve('Ok')
+          } else {
+            reject(resp.statusMessage)
+          }
+        }
+      })
+      .catch(reject)
+  })
+}
+
+module.exports = { getEpisode, episodeMark, episodeEmotion }

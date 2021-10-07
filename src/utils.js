@@ -34,7 +34,7 @@ async function setCookie (callback, obj, remove = false) {
     fs.write(d, JSON.stringify(setting, null, '\t'), 0, 'utf-8', err => {
       if (err) return err
 
-      const txt = remove ? 'Credenciales eliminadas' : 'Credenciales almacenadas'
+      const txt = remove ? 'Deleting credentials' : 'Storing credentials'
 
       callback(txt)
     })
@@ -80,9 +80,10 @@ function get (urlPath, data) {
 
 function post (urlPath, data) {
   const url = urlBase + urlPath
+  const cookies = { cookies: getCookies() }
 
   return new Promise((resolve, reject) => {
-    needle('post', url, data)
+    needle('post', url, data, cookies)
       .then(resp => {
         const cookies = resp.cookies
 

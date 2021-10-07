@@ -67,3 +67,13 @@ Methods
 | unFollowShow | UnFollow Show | idShow | ✔ | |
 | episodeWatch | Mark episode as watched | idEpisode | ✔ | |
 | episode | Get info about | idShow, idEpisode | | Array |
+| episodeEmotions | Set emotions episode | idEpisode, idEmotion | ✔ | |
+
+### Emotions
+
+* 😀 Good = 1
+* 😄 Fun = 2
+* 😲 Wow = 3
+* 😢 Sad = 4
+* 🙄 So-so = 6
+* 😶 Bad = 7

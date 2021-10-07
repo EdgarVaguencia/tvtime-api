@@ -10,5 +10,6 @@ module.exports = {
   followShow: shows.followShow,
   unFollowShow: shows.unfollowShow,
   episode: episode.getEpisode,
-  episodeWatch: episode.episodeMark
+  episodeWatch: episode.episodeMark,
+  episodeEmotions: episode.episodeEmotion
 }
