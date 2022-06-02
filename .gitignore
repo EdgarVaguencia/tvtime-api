@@ -6,3 +6,10 @@ node_modules
 
 # test
 test
+
+#compiled
+dist
+!dist/access.json
+
+.env
+*.env
