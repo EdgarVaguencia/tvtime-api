@@ -1,7 +1,7 @@
 {
   "name": "tvtime-api",
   "description": "Unofficial TvTime Api for node",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "version": "0.3.0",
   "keywords": [
     "tvtime",
@@ -19,15 +19,23 @@
   "scripts": {
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
-    "postpublish": "pinst --enable"
+    "postpublish": "pinst --enable",
+    "build": "tsc -p .",
+    "prepublish": "npm run build",
+    "prettier-format": "prettier --config .prettierrc \"src/**/*.ts\" --write"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.9",
     "needle": "^2.6.0"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.31",
+    "@types/needle": "^2.5.3",
+    "@types/node": "^17.0.38",
+    "dotenv": "^16.0.1",
     "husky": "^7.0.2",
     "pinst": "^2.1.6",
+    "prettier": "^2.6.2",
     "standard": "^16.0.3"
   }
 }

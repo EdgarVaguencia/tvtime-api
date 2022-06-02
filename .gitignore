@@ -6,3 +6,9 @@ node_modules
 
 # test
 test
+
+#compiled
+dist
+
+.env
+*.env
