@@ -5,7 +5,7 @@ node_modules
 *.log
 
 # test
-
+test
 
 #compiled
 dist
