@@ -9,7 +9,6 @@ test
 
 #compiled
 dist
-!dist/access.json
 
 .env
 *.env
